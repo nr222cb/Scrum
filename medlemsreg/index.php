@@ -6,6 +6,20 @@ $connectID = mysql_connect($hostUrl, $userName, $password) or die("Sorry, can't 
 
 //välj db att läsa ifrån
 mysql_select_db("a2086984_medlem", $connectID) or die("Unable to select database");
+
+//hämta upp det fältet som skall tas bort
+if ($_GET['delete_id']) {
+	$id = ($_GET['delete_id']);
+
+	$success = mysql_query("DELETE FROM medlemsreg WHERE medlemsid = $id", $connectID) or die("Unable to delete record from database");
+
+	//gå vidare till bekräftelse om borttagning
+	if ($success) {
+		header('Location: form_confirm2.php');
+
+		exit();
+	}
+}
 ?>
 
 <!DOCTYPE html>
@@ -13,6 +27,7 @@ mysql_select_db("a2086984_medlem", $connectID) or die("Unable to select database
 	<head>
 		<meta charset="utf-8" />
 		<title>Medlemsregister</title>
+		<meta name="viewport" content="width=device-width; initial-scale=1.0" />
 		<style type="text/css">
 			body {
 				font-family: verdana, arial, sans-serif;
@@ -46,13 +61,13 @@ mysql_select_db("a2086984_medlem", $connectID) or die("Unable to select database
 	<body>
 		<h3>Medlemsregister</h3>
 		<p>
-			<a href="???.php">Lägg upp en medlem i registret</a>
+			<a href="addmember.php">Lägg upp en medlem i registret</a>
 		</p>
 		<?php
 		//hämta data från db
 		$myResult = mysql_query("SELECT * FROM medlemsreg", $connectID) or die("Unable to select item by ID from database");
 		//bygg tabell
-		print '<table border="1">' . "\n";
+		print '<table>' . "\n";
 		print '<tr>' . "\n";
 		print '<th>' . 'Förnamn' . '</th>' . "\n";
 		print '<th>' . 'Efternamn' . '</th>' . "\n";
@@ -65,7 +80,11 @@ mysql_select_db("a2086984_medlem", $connectID) or die("Unable to select database
 			print '<td>' . $row['fnamn'] . '</td>' . "\n";
 			print '<td>' . $row['enamn'] . '</td>' . "\n";
 			print '<td>' . $row['telefon'] . '</td>' . "\n";
-			
+			$id = $row['medlemsid'];
+			print '<td><a href="modifymember.php?modify_id=' . $id . '">Ändra</td>';
+			print '<td><a href="';
+			print($_SERVER['PHP_SELF']);
+			print '?delete_id=' . $id . '">Radera</a></td>';
 			print '</tr>' . "\n";
 		}
 		print '</table>' . "\n";
